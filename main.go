@@ -2,36 +2,29 @@ package main
 
 import (
 	"encoding/csv"
-	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/xuri/excelize/v2"
 )
 
 func main() {
 
-	inputFlag := flag.String("i", "", "Path to the input file")
-	outputFlag := flag.String("o", "", "Name of output file")
+    fileName := os.Args[1]
 
-	flag.Parse()
+    fileName = filepath.ToSlash(fileName)
 
-	if *inputFlag == "i" {
-		fmt.Println("Please provide a file using the -i flag.")
-		os.Exit(1)
-	}
-	if *outputFlag == "o" {
-		fmt.Println("Please provide a file using the -o flag.")
-		os.Exit(1)
-	}
-
-	file, err := os.Open(*inputFlag)
+	file, err := os.Open(fileName)
 	if err != nil {
 		fmt.Println("Error opening this file.")
 		os.Exit(0)
 	}
+
+    fmt.Println(fileName)
 
 	outputFile := excelize.NewFile()
 
@@ -71,13 +64,19 @@ func main() {
 
 	excelWriter(outputFile, records)
 
-	outputFileName := *outputFlag + ".xlsx"
+    currentTime := time.Now()
+
+    formattedTime := currentTime.Format(time.RFC822)
+
+    output := "PullSheet_" + strings.Replace(formattedTime, " ", "_", -1)
+
+	outputFileName := output + ".xlsx"
 
 	if err := outputFile.SaveAs(outputFileName); err != nil {
 		fmt.Println("Unable to save file: ", err)
 		return
 	} else {
-		fmt.Printf("Excel file created: %s.xlsx", *outputFlag)
+		fmt.Println("Excel file created: ", outputFileName)
 	}
 
 }
