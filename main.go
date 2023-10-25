@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -45,6 +44,7 @@ func main() {
 		for _, field := range record {
 			strings.Replace(field, "\"", "", -1)
 		}
+        fmt.Println(record)
 	}
 
 	matrixQuickSort(records, 1, len(records)-2, 0)
@@ -64,13 +64,9 @@ func main() {
 
 	excelWriter(outputFile, records)
 
-    currentTime := time.Now()
+    outFile := strings.Split(fileName, ".")
 
-    formattedTime := currentTime.Format(time.RFC822)
-
-    output := "PullSheet_" + strings.Replace(formattedTime, " ", "_", -1)
-
-	outputFileName := output + ".xlsx"
+	outputFileName := outFile[0] + ".xlsx"
 
 	if err := outputFile.SaveAs(outputFileName); err != nil {
 		fmt.Println("Unable to save file: ", err)
@@ -83,6 +79,7 @@ func main() {
 
 func excelWriter(file *excelize.File, matrix [][]string) {
 	for i := 0; i < len(matrix); i++ {
+        fmt.Println(i)
 
 		for j := 0; j < len(matrix[0]); j++ {
 			file.SetCellStr("Sheet1", string(rune('A'+j))+strconv.Itoa(i+1), matrix[i][j])
@@ -120,16 +117,3 @@ func partition(matrix [][]string, low int, high int, col int) int {
 
 	return i + 1
 }
-
-// func groupByGame(matrix [][]string) {
-//
-//     var games map[string]int
-//
-//     for i := 0; i < len(matrix); i++ {
-//         if _, exists := games[matrix[i][0]]; !exists {
-//             games[matrix[i][0]] = 1
-//         } else {
-//             games[matrix[i][0]] += 1
-//         }
-//     }
-// }
