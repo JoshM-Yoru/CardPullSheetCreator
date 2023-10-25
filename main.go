@@ -50,12 +50,24 @@ func main() {
 	for _, record := range records {
 
 		for _, field := range record {
-			cleanedLine := strings.Replace(field, "\"", "", -1)
-			fmt.Println(cleanedLine)
+			strings.Replace(field, "\"", "", -1)
 		}
 	}
 
-	matrixQuickSort(records, 1, len(records)-2)
+	matrixQuickSort(records, 1, len(records)-2, 0)
+
+	for i := 1; i < len(records)-1; i++ {
+
+		low := 1
+
+		if i == len(records)-2 {
+			matrixQuickSort(records, low, len(records)-2, 1)
+		}
+
+		if records[i][0] != records[i-1][0] && i-low > 1 {
+			matrixQuickSort(records, low, i, 1)
+		}
+	}
 
 	excelWriter(outputFile, records)
 
@@ -79,28 +91,28 @@ func excelWriter(file *excelize.File, matrix [][]string) {
 	}
 }
 
-func matrixQuickSort(matrix [][]string, low int, high int) {
+func matrixQuickSort(matrix [][]string, low int, high int, col int) {
 
 	if low < high {
-		pivot := partition(matrix, low, high)
+		pivot := partition(matrix, low, high, col)
 
-		matrixQuickSort(matrix, low, pivot-1)
-		matrixQuickSort(matrix, pivot+1, high)
+		matrixQuickSort(matrix, low, pivot-1, col)
+		matrixQuickSort(matrix, pivot+1, high, col)
 	}
 
 }
 
-func partition(matrix [][]string, low, high int) int {
+func partition(matrix [][]string, low int, high int, col int) int {
 
-	pivot := matrix[high][0]
+	pivot := matrix[high][col]
 
 	i := low - 1
 
 	for j := low; j <= high-1; j++ {
 
-		if matrix[j][0] <= pivot {
+		if matrix[j][col] <= pivot {
 			i++
-			matrix[i][0], matrix[j][0] = matrix[j][0], matrix[i][0]
+			matrix[i][col], matrix[j][col] = matrix[j][col], matrix[i][col]
 		}
 
 	}
@@ -109,3 +121,16 @@ func partition(matrix [][]string, low, high int) int {
 
 	return i + 1
 }
+
+// func groupByGame(matrix [][]string) {
+//
+//     var games map[string]int
+//
+//     for i := 0; i < len(matrix); i++ {
+//         if _, exists := games[matrix[i][0]]; !exists {
+//             games[matrix[i][0]] = 1
+//         } else {
+//             games[matrix[i][0]] += 1
+//         }
+//     }
+// }
